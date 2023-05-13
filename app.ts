@@ -14,10 +14,18 @@ if (process.env.NODE_ENV === 'production') {
 }
 
 import Koa from 'koa';
+import http from 'http';
+import { Server } from 'socket.io';
 import { koaBody } from 'koa-body';
 
 const app = new Koa();
+const server = http.createServer(app.callback());
+const io = new Server(server);
 
 app.use(koaBody());
+
+io.on('connection', socket => {
+  console.log(`socket ${socket.id} connected`);
+});
 
 app.listen(process.env.PORT, () => console.log(`Server is running on port ${process.env.PORT}`));
