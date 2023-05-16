@@ -14,18 +14,38 @@ if (process.env.NODE_ENV === 'production') {
 }
 
 import Koa from 'koa';
+import cors from '@koa/cors';
+import cookie from 'koa-cookie';
+import { ioCookieParser } from 'socket.io-cookies-parser';
 import http from 'http';
 import { Server } from 'socket.io';
 import { koaBody } from 'koa-body';
+import { setCookie } from 'koa-cookies';
+import { SocketType } from './src/socket/socketio.types';
+import TestEvent from './src/socket/testHandlers';
 
 const app = new Koa();
-const server = http.createServer(app.callback());
-const io = new Server(server);
-
+app.use(cookie());
 app.use(koaBody());
 
-io.on('connection', socket => {
-  console.log(`socket ${socket.id} connected`);
+const server = http.createServer(app.callback());
+const io = new Server(server, {
+  cors : {
+    origin : '*',
+    methods : ['GET', 'HEAD', 'POST', 'OPTIONS'],
+    credentials : true,
+  },
+  cookie : true,
 });
 
-app.listen(process.env.PORT, () => console.log(`Server is running on port ${process.env.PORT}`));
+app.use(setCookie('testKey', 'testValue'));
+app.use(ctx => console.log('ctx cookie : ', ctx.headers.cookie));
+
+const onConnection = (socket: SocketType) => {
+  console.log('id : ', socket.id);
+  TestEvent(io, socket);
+};
+
+io.use(ioCookieParser).on('connection', onConnection);
+
+server.listen(process.env.PORT, () => console.log(`Server is running on port ${process.env.PORT}`));
