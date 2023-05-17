@@ -1,3 +1,5 @@
+// noinspection BadExpressionStatementJS
+
 import dotenv from 'dotenv';
 import path from 'path';
 
@@ -15,17 +17,16 @@ if (process.env.NODE_ENV === 'production') {
 
 import Koa from 'koa';
 import cors from '@koa/cors';
-import cookie from 'koa-cookie';
-import { ioCookieParser } from 'socket.io-cookies-parser';
 import http from 'http';
+// eslint-disable-next-line no-unused-vars
+import { client, createClient } from './src/config/redis';
 import { Server } from 'socket.io';
 import { koaBody } from 'koa-body';
-import { setCookie } from 'koa-cookies';
 import { SocketType } from './src/socket/socketio.types';
 import TestEvent from './src/socket/testHandlers';
 
 const app = new Koa();
-app.use(cookie());
+
 app.use(koaBody());
 
 const server = http.createServer(app.callback());
@@ -38,14 +39,17 @@ const io = new Server(server, {
   cookie : true,
 });
 
-app.use(setCookie('testKey', 'testValue'));
+(async () => {
+  await createClient();
+})();
+
 app.use(ctx => console.log('ctx cookie : ', ctx.headers.cookie));
 
-const onConnection = (socket: SocketType) => {
+const onConnection = async (socket: SocketType) => {
   console.log('id : ', socket.id);
   TestEvent(io, socket);
 };
 
-io.use(ioCookieParser).on('connection', onConnection);
+io.on('connection', onConnection);
 
 server.listen(process.env.PORT, () => console.log(`Server is running on port ${process.env.PORT}`));

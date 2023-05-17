@@ -1,11 +1,13 @@
 import { Io, SocketType, Payload } from './socketio.types';
-import { client } from '../config/redis';
 
 export default (io: Io, socket: SocketType) => {
   const roomMessage = (payload: Payload, done: any) => {
     console.log(`${socket.id} sending : ${payload.message}`);
-    console.log(io.sockets.adapter.rooms);
-    console.log(io.sockets.adapter.sids);
+    io.in('testRoom').emit('room:message', payload);
+    done(payload.message);
+  };
+
+  const valifyRoom = (payload:Payload) => {
     const { sockets : { adapter : { rooms, sids } } } = io;
     const result: any = [];
     rooms.forEach((_, key) => {
@@ -13,14 +15,12 @@ export default (io: Io, socket: SocketType) => {
         result.push(key);
       }
     });
-    console.log(result);
-    io.in('testRoom').emit('room:message', payload);
-    done(payload.message);
-  };
 
-  const enterRoom = async (payload: Payload) => {
+    result.includes(payload.roomName)
+  }
+
+  const enterRoom = (payload: Payload) => {
     console.log(`${socket.id} entering : testRoom`);
-    await client.set('socketId', socket.id);
     socket.join(`${payload.roomId!}`);
   };
 
@@ -29,20 +29,7 @@ export default (io: Io, socket: SocketType) => {
     socket.leave('testRoom');
   };
 
-  const sendMessage = (payload: any, done: any) => {
-    console.log(`${socket.id} sending : ${payload.message}`);
-    io.emit('nps:message', payload);
-    done(payload);
-  };
-
-  const setUserInfo = (payload: any) => {
-    console.log(`${socket.id}'s info : ${payload}`);
-    socket.data.user = payload;
-  };
-
   socket.on('room:message', roomMessage);
   socket.on('room:enter', enterRoom);
   socket.on('room:leave', leaveRoom);
-  socket.on('nsp:message', sendMessage);
-  socket.on('user:register', setUserInfo);
 };
