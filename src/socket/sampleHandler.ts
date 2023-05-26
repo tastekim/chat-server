@@ -17,7 +17,7 @@ export default (io: Io, socket: SocketType) => {
     const messages = await getRoomFromCache(room);
     // Use the callback to respond with the room's message history
     // Callbacks are more commonly used for event listeners than promises
-    callback(null, messages);
+    // callback(null, messages);
   };
   const updateSocketId = async ({ user, room }: SamplePayload) => {
     addUser(socket.id, user, room);
@@ -31,9 +31,9 @@ export default (io: Io, socket: SocketType) => {
       // Push message to clients in chat room
       io.in(room).emit('message', msg);
       await addMessageToCache(room, msg);
-      callback();
+      // callback();
     } else {
-      callback('User session not found.');
+      // callback('User session not found.');
     }
   };
   const disconnect = () => {
