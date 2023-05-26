@@ -6,4 +6,4 @@ steps:
     entrypoint: npm
     args: [ 'run', 'build' ]
 options:
-  logging: GCS_ONLY
+  logging: CLOUD_LOGGING_ONLY
