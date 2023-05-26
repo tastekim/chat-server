@@ -35,8 +35,9 @@ export default (io: Io, socket: SocketType) => {
     done(payload);
   };
 
-  const setUserInfo = (payload: any) => {
+  const setUserInfo = async (payload: any) => {
     console.log(`${socket.id}'s info : ${payload}`);
+    await client.set(socket.id, payload);
     socket.data.user = payload;
   };
 

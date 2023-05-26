@@ -16,15 +16,15 @@ if (process.env.NODE_ENV === 'production') {
 }
 
 import Koa from 'koa';
-import cors from '@koa/cors';
+// import cors from '@koa/cors';
 import http from 'http';
-// eslint-disable-next-line no-unused-vars
-import { client, createClient } from './src/config/redis';
+import { createClient } from './src/config/redis';
 import { Server } from 'socket.io';
 import { koaBody } from 'koa-body';
 import { SocketType } from './src/socket/socketio.types';
 import TestEvent from './src/socket/testHandlers';
 
+const { PORT } = process.env;
 const app = new Koa();
 
 app.use(koaBody());
@@ -43,8 +43,6 @@ const io = new Server(server, {
   await createClient();
 })();
 
-app.use(ctx => console.log('ctx cookie : ', ctx.headers.cookie));
-
 const onConnection = async (socket: SocketType) => {
   console.log('id : ', socket.id);
   TestEvent(io, socket);
@@ -52,4 +50,4 @@ const onConnection = async (socket: SocketType) => {
 
 io.on('connection', onConnection);
 
-server.listen(process.env.PORT, () => console.log(`Server is running on port ${process.env.PORT}`));
+server.listen(process.env.PORT, () => console.log(`Server is running on port ${PORT}`));

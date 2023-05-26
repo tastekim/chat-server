@@ -2,15 +2,15 @@
   "name": "chat-server",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "dist/app.js",
   "engines": {
     "node": "16.16.0"
   },
   "scripts": {
     "lint:check": "eslint src/**/*.ts",
     "dev": "NODE_ENV=development nodemon -e ts",
-    "start": "npm run types:check && NODE_ENV=production nodemon dist/src/app.js",
-    "types:check": "tsc --build"
+    "start": "npm run build && NODE_ENV=production node dist/app.js",
+    "build": "tsc --build"
   },
   "keywords": [],
   "author": "",
