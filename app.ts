@@ -1,33 +1,22 @@
-// noinspection BadExpressionStatementJS
-
-import dotenv from 'dotenv';
-import path from 'path';
-
-// NODE_ENV 에 맞게 env 파일 설정.
-if (process.env.NODE_ENV === 'production') {
-  console.log(process.env.NODE_ENV);
-  dotenv.config({ path : path.join(__dirname, '/.env.production') });
-} else if (process.env.NODE_ENV === 'development') {
-  console.log(process.env.NODE_ENV);
-  dotenv.config({ path : path.join(__dirname, '/.env.local') });
-} else {
-  console.error('Not defined process.env.NODE_ENV');
-  throw new Error('Not defined process.env.NODE_ENV');
-}
-
 import Koa from 'koa';
 // import cors from '@koa/cors';
 import http from 'http';
-import { createClient } from './src/config/redis';
+// import { createClient } from './src/config/redis';
 import { Server } from 'socket.io';
 import { koaBody } from 'koa-body';
+import { redisClient } from './src/config/redis';
 import { SocketType } from './src/socket/socketio.types';
+import { createAdapter } from '@socket.io/redis-adapter';
 import TestEvent from './src/socket/testHandlers';
+import SampleEvent from './src/socket/sampleHandler';
 
-const { PORT } = process.env;
 const app = new Koa();
 
 app.use(koaBody());
+
+app.use(ctx => {
+  ctx.response.body = 'connected.';
+});
 
 const server = http.createServer(app.callback());
 const io = new Server(server, {
@@ -39,15 +28,25 @@ const io = new Server(server, {
   cookie : true,
 });
 
-(async () => {
-  await createClient();
-})();
+const subClient = redisClient.duplicate();
+
+io.adapter(createAdapter(redisClient, subClient));
+
+// Add error handlers
+redisClient.on('error', (err: Error) => {
+  console.error(err.message);
+});
+
+subClient.on('error', (err: Error) => {
+  console.error(err.message);
+});
 
 const onConnection = async (socket: SocketType) => {
   console.log('id : ', socket.id);
   TestEvent(io, socket);
+  SampleEvent(io, socket);
 };
 
 io.on('connection', onConnection);
 
-server.listen(process.env.PORT, () => console.log(`Server is running on port ${PORT}`));
+export { server };

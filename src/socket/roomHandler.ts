@@ -7,7 +7,7 @@ export default (io: Io, socket: SocketType) => {
     done(payload.message);
   };
 
-  const valifyRoom = (payload:Payload) => {
+  const valifyRoom = (payload: Payload) => {
     const { sockets : { adapter : { rooms, sids } } } = io;
     const result: any = [];
     rooms.forEach((_, key) => {
@@ -16,8 +16,8 @@ export default (io: Io, socket: SocketType) => {
       }
     });
 
-    result.includes(payload.roomName)
-  }
+    result.includes(payload.roomName);
+  };
 
   const enterRoom = (payload: Payload) => {
     console.log(`${socket.id} entering : testRoom`);

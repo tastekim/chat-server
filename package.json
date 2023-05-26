@@ -2,14 +2,14 @@
   "name": "chat-server",
   "version": "1.0.0",
   "description": "",
-  "main": "dist/app.js",
+  "main": "dist/index.js",
   "engines": {
     "node": "16.16.0"
   },
   "scripts": {
     "lint:check": "eslint src/**/*.ts",
     "dev": "NODE_ENV=development nodemon -e ts",
-    "start": "npm run build && NODE_ENV=production node dist/app.js",
+    "start": "node dist/index.js",
     "build": "tsc --build"
   },
   "keywords": [],
@@ -17,6 +17,7 @@
   "dependencies": {
     "@koa/cors": "^4.0.0",
     "@koa/router": "^12.0.0",
+    "@socket.io/redis-adapter": "^8.2.1",
     "dotenv": "^16.0.3",
     "koa": "^2.14.1",
     "koa-body": "^6.0.1",
@@ -24,9 +25,7 @@
     "koa-cookies": "^3.1.4",
     "koa-session": "^6.4.0",
     "redis": "^4.6.6",
-    "redis-om": "^0.3.6",
-    "socket.io": "^4.6.1",
-    "socket.io-cookies-parser": "^1.1.1"
+    "socket.io": "^4.6.1"
   },
   "devDependencies": {
     "@types/koa": "^2.13.5",

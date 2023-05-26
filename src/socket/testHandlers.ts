@@ -1,5 +1,5 @@
 import { Io, SocketType, Payload } from './socketio.types';
-import { client } from '../config/redis';
+// import { client } from '../config/redis';
 
 export default (io: Io, socket: SocketType) => {
   const roomMessage = (payload: Payload, done: any) => {
@@ -20,7 +20,6 @@ export default (io: Io, socket: SocketType) => {
 
   const enterRoom = async (payload: Payload) => {
     console.log(`${socket.id} entering : testRoom`);
-    await client.set('socketId', socket.id);
     socket.join(`${payload.roomId!}`);
   };
 
@@ -37,7 +36,6 @@ export default (io: Io, socket: SocketType) => {
 
   const setUserInfo = async (payload: any) => {
     console.log(`${socket.id}'s info : ${payload}`);
-    await client.set(socket.id, payload);
     socket.data.user = payload;
   };
 

@@ -11,3 +11,12 @@ export interface Payload {
   roomId?: number;
   uid: string;
 }
+
+export interface SamplePayload {
+  user: string;
+  room: string;
+}
+export interface SampleMessage {
+  user: string;
+  text: string;
+}
