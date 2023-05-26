@@ -5,5 +5,5 @@ steps:
   - name: node:$_NODE_VERSION
     entrypoint: npm
     args: [ 'run', 'build' ]
-  options:
-    logging: GCS_ONLY
+options:
+  logging: GCS_ONLY
